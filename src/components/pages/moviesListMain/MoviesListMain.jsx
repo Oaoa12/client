@@ -7,13 +7,11 @@ import MoviesList from '../../ui/moviesList/MoviesList';
 import { ArrowBack } from '@mui/icons-material';
 import ErrorMessage from '../../ui/errorMessage/ErrorMessage';
 import MoviesListTopSkeleton from '../../ui/moviesListTopSkeleton/MoviesListMainSkeleton';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import SelectMovies from '../../ui/selectMovies/SelectMovies';
-import { selectQuery } from '../../../features/currentQuerySlice';
 
 export default function MoviesListMain() {
   const location = useLocation();
-  const dispatch = useDispatch();
   const currentQuery = useSelector((state) => state.currentQuery) || {};
   const { countries = '', order = 'NUM_VOTE', year = '', genreId = '' } = currentQuery;
   const [page, setPage] = useState(1);
@@ -36,15 +34,14 @@ export default function MoviesListMain() {
     data: filmsData,
     error: filmsError,
     isLoading: filmsIsLoading,
-    refetch,
   } = useGetFilmsQuery(queryParams, { skip: !movieType });
 
   const { data: filtersData, error: filtersError, isLoading: filtersIsLoading } = useGetGenresAndCountriesQuery();
 
   useEffect(() => {
-    refetch();
+    // Сбрасываем на первую страницу при изменении фильтров
     setPage(1);
-  }, [countries, order, year, genreId, location.pathname, refetch]);
+  }, [countries, order, year, genreId, location.pathname]);
 
   if (filmsError || filtersError) {
     return <ErrorMessage />;
