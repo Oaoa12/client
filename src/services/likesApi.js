@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const likesApi = createApi({
   reducerPath: 'likesApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:5000/api/likes',
+    baseUrl: 'https://server-ds6n.onrender.com/api/likes',
     credentials: 'include',
     prepareHeaders: (headers) => {
       const token = localStorage.getItem('accessToken');
@@ -23,7 +23,7 @@ export const likesApi = createApi({
         } catch (error) {
           if (error.error?.status === 401) {
             try {
-              const response = await fetch('http://localhost:5000/api/user/refresh', {
+              const response = await fetch('https://server-ds6n.onrender.com/api/user/refresh', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ refreshToken: localStorage.getItem('refreshToken') }),
