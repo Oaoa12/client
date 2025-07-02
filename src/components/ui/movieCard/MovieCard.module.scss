@@ -1,24 +1,38 @@
 .card {
-    width: 215px;
-    margin: 8px;
+  width: 100%;
+  margin: 4px;
+
+  @media (max-width: 600px) {
+    margin: 2px;
   }
-  
-  .img {
-    width: 100%;
-    height: 325px;
-    object-fit: cover;
-    border-radius: 4px;
-    transition: transform 0.5s;
+}
+
+.img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s;
+
+  @media (max-width: 600px) {
+    height: 200px;
   }
-  
-  .img:hover {
-    transform: scale(1.03);
+}
+
+.img:hover {
+  transform: scale(1.03);
+}
+
+.title {
+  margin-top: 4px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.85rem;
+
+  @media (max-width: 600px) {
+    margin-top: 2px;
+    font-size: 0.75rem;
   }
-  
-  .title {
-    margin-top: 8px;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+}

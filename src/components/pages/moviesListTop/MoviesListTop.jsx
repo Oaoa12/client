@@ -1,103 +1,86 @@
 import React, { useEffect, useState } from 'react';
-import { useGetFilmsQuery, useGetGenresAndCountriesQuery } from '../../../services/kinopoiskApi';
-import { MOVIE_LISTS } from '../../../constants';
+import { useGetFilmsTopQuery } from '../../../services/kinopoiskApi';
+import { TOP_LISTS } from '../../../constants';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Stack, Typography, useTheme, useMediaQuery, Box } from '@mui/material';
+import { Button, Stack, Typography, Box, useTheme, useMediaQuery } from '@mui/material';
 import MoviesList from '../../ui/moviesList/MoviesList';
 import { ArrowBack } from '@mui/icons-material';
 import ErrorMessage from '../../ui/errorMessage/ErrorMessage';
 import MoviesListTopSkeleton from '../../ui/moviesListTopSkeleton/MoviesListMainSkeleton';
-import { useSelector, useDispatch } from 'react-redux';
-import SelectMovies from '../../ui/selectMovies/SelectMovies';
-import { selectQuery } from '../../../features/currentQuerySlice';
 
-export default function MoviesListMain() {
+export default function MoviesListTop() {
   const location = useLocation();
-  const dispatch = useDispatch();
-  const currentQuery = useSelector((state) => state.currentQuery) || {};
-  const { countries = '', order = 'NUM_VOTE', year = '', genreId = '' } = currentQuery;
-  const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const movieType = MOVIE_LISTS.find((el) => el.url === location.pathname);
+  const [page, setPage] = useState(1);
 
-  console.log('MoviesListMain: Current query:', currentQuery);
+  const topType = TOP_LISTS.find((el) => el.url === location.pathname);
 
   const queryParams = {
-    type: movieType?.value || 'FILM',
-    countries,
-    order,
-    year,
-    genreId: movieType?.url === '/cartoons' && !genreId ? '18' : genreId,
+    type: topType?.value || 'TOP_POPULAR_ALL',
     page,
   };
+
+  const isValidQuery = queryParams.type && queryParams.page > 0;
 
   const {
     data: filmsData,
     error: filmsError,
     isLoading: filmsIsLoading,
-    refetch,
-  } = useGetFilmsQuery(queryParams, { skip: !movieType });
-
-  const { data: filtersData, error: filtersError, isLoading: filtersIsLoading } = useGetGenresAndCountriesQuery();
+    isFetching,
+  } = useGetFilmsTopQuery(queryParams, { skip: !isValidQuery || !topType });
 
   useEffect(() => {
-    console.log('MoviesListMain: Filters changed, refetching:', queryParams);
-    refetch();
     setPage(1);
-  }, [countries, order, year, genreId, location.pathname, refetch]);
+  }, [location.pathname]);
 
-  if (filmsError || filtersError) {
-    console.log('MoviesListMain: Error:', filmsError || filtersError);
-    return <ErrorMessage />;
+  if (filmsError) {
+    return <ErrorMessage message={filmsError?.data?.message || 'Произошла ошибка'} />;
   }
-  if (filmsIsLoading || filtersIsLoading) {
-    console.log('MoviesListMain: Loading...');
+
+  if (filmsIsLoading || isFetching) {
     return <MoviesListTopSkeleton />;
   }
-  if (!movieType) {
-    console.log('MoviesListMain: Movie type not found');
+
+  if (!topType) {
     return <ErrorMessage message="Страница не найдена" />;
   }
 
   return (
-    <Box sx={{ px: isMobile ? 1 : 3, py: 2 }}>
-      <Stack direction="row" alignItems="center" sx={{ mb: 2, mt: isMobile ? 0 : 2 }}>
-        <Button 
-          startIcon={<ArrowBack />} 
+    <Box sx={{ px: { xs: 0.5, sm: 1 }, py: { xs: 0.5, sm: 1 } }}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        sx={{ mb: { xs: 0.5, sm: 1 }, px: { xs: 0.5, sm: 0 } }}
+      >
+        <Button
+          startIcon={<ArrowBack fontSize={isMobile ? 'small' : 'medium'} />}
           onClick={() => navigate(-1)}
           size={isMobile ? 'small' : 'medium'}
-          sx={{ minWidth: 'auto', mr: 1 }}
-        />
-        <Typography 
-          variant={isMobile ? 'h5' : 'h4'} 
-          sx={{ fontWeight: 600 }}
+          sx={{ minWidth: 'auto', mr: { xs: 0.5, sm: 1 }, py: { xs: 0.5 } }}
+          variant="text"
         >
-          {movieType.title}
+          Назад
+        </Button>
+        <Typography
+          variant={isMobile ? 'h6' : 'h4'}
+          sx={{ fontWeight: 600, fontSize: { xs: '0.9rem', sm: '1.2rem', md: '1.5rem' } }}
+        >
+          {topType.title}
         </Typography>
       </Stack>
-      
-      <Box sx={{ mb: 3 }}>
-        <SelectMovies
-          countriesList={filtersData?.countries || []}
-          genresList={filtersData?.genres || []}
-          countries={countries}
-          order={order}
-          year={year}
-          genreId={genreId}
+
+      <Box sx={{ overflowX: 'auto', pb: { xs: 1, sm: 1.5 } }}>
+        <MoviesList
+          movies={filmsData?.items || []}
+          totalPages={filmsData?.totalPages || 1}
+          page={page}
+          setPage={setPage}
           isMobile={isMobile}
         />
       </Box>
-      
-      <MoviesList
-        movies={filmsData?.items || []}
-        totalPages={filmsData?.totalPages || 1}
-        page={page}
-        setPage={setPage}
-        isMobile={isMobile}
-      />
     </Box>
   );
 }
