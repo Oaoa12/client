@@ -217,44 +217,6 @@ const MovieDetail = () => {
               alt={responseFilm.data.nameRu}
               className="movie-poster"
             />
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <span>{likesData?.likes || 0}</span>
-              <Tooltip title={isFavorite ? 'Убрать лайк' : 'Добавить лайк'}>
-              <IconButton
-                onClick={handleLike}
-                disabled={isAuthenticated && likesData?.userReaction === true}
-              >
-                <ThumbUpIcon sx={{ color: likesData?.userReaction === true ? '#4f9c60' : 'inherit' }} />
-              </IconButton>
-              </Tooltip>
-              <span>{likesData?.dislikes || 0}</span>
-              <Tooltip title={isFavorite ? 'Убрать дизлайк' : 'Добавить дизлайк'}>
-              <IconButton
-                onClick={handleDislike}
-                disabled={isAuthenticated && likesData?.userReaction === false}
-              >
-                <ThumbDownIcon color={likesData?.userReaction === false ? 'error' : 'inherit'} />
-              </IconButton>
-              </Tooltip>
-              <Tooltip title={isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}>
-                <IconButton
-                  onClick={handleFavoriteToggle}
-                  disabled={isAddingFavorite || isRemovingFavorite}
-                  sx={{
-                    '&:hover': {
-                      transform: 'scale(1.2)',
-                      transition: 'transform 0.2s ease-in-out',
-                    },
-                  }}
-                >
-                  {isFavorite ? (
-                    <FavoriteIcon sx={{ color: '#ff0000' }} />
-                  ) : (
-                    <FavoriteBorderIcon />
-                  )}
-                </IconButton>
-              </Tooltip>
-            </Box>
           </div>
           <div className="info-section">
             <Typography variant="h3" className="movie-title">

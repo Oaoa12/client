@@ -90,24 +90,6 @@ const NavBar = () => {
                   {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
                 </IconButton>
               </Box>
-
-              {isAuthenticated ? (
-                <Button color="inherit" onClick={() => navigate('/favorites')}>
-                  Избранное
-                </Button>
-              ) : (
-               null
-              )}
-
-              {isAuthenticated ? (
-                <Button color="inherit" onClick={handleLogout}>
-                  Выйти
-                </Button>
-              ) : (
-                <Button color="inherit" onClick={() => navigate('/registration')}>
-                  Регистрация
-                </Button>
-              )}
             </Stack>
           </Toolbar>
         </AppBar>
