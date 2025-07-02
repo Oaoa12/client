@@ -16,7 +16,9 @@ export const store = configureStore({
     auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware()
+    getDefaultMiddleware({
+      serializableCheck: false, 
+    })
       .concat(kinopoiskApi.middleware)
       .concat(likesApi.middleware)
       .concat(favoritesApi.middleware),
