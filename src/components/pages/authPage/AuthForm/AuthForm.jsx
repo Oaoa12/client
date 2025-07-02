@@ -22,10 +22,11 @@ const AuthForm = ({ isLogin }) => {
     try {
       const endpoint = isLogin ? 'login' : 'registration';
       const body = isLogin ? { email: data.email, password: data.password } : data;
-      const response = await fetch(`http://localhost:5000/api/user/${endpoint}`, {
+      const response = await fetch(`https://server-ds6n.onrender.com/api/user/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        credentials: 'include'
       });
 
       const result = await response.json();
