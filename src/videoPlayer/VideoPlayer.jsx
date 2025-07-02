@@ -14,7 +14,7 @@ const VideoPlayer = () => {
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>Сорян плеера нет</h3>
+      <h3 className={styles.title}> плеера нет</h3>
       <div className={styles.sourcesList}>
         {officialSources.map((source, index) => (
           <a 

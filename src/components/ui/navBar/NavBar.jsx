@@ -16,7 +16,9 @@ import {
   Button,
   Drawer,
   Slide,
-  useScrollTrigger
+  useScrollTrigger,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { MOVIE_LISTS, TOP_LISTS, iconComponents } from '../../../constants';
@@ -46,6 +48,8 @@ const NavBar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleOpen = () => {
     setOpen(prev => !prev);
@@ -60,14 +64,18 @@ const NavBar = () => {
     <React.Fragment>
       <HideOnScroll>
         <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-          <Toolbar sx={{ paddingLeft: { xs: 2, sm: 4 } }}>
+          <Toolbar sx={{ 
+            paddingLeft: { xs: 1, sm: 2, md: 4 },
+            paddingRight: { xs: 1, sm: 2 }
+          }}>
             <IconButton
               color="inherit"
               onClick={handleOpen}
               edge="start"
-              sx={{ mr: 2 }}
+              sx={{ mr: 1 }}
+              size={isMobile ? 'small' : 'medium'}
             >
-              <MenuIcon />
+              <MenuIcon fontSize={isMobile ? 'small' : 'medium'} />
             </IconButton>
             <Stack
               flexDirection="row"
@@ -76,18 +84,30 @@ const NavBar = () => {
               width="100%"
             >
               <Typography
-                sx={{ color: 'white', textDecoration: 'none' }}
-                variant="h5"
+                sx={{ 
+                  color: 'white', 
+                  textDecoration: 'none',
+                  fontSize: isMobile ? '1.1rem' : '1.5rem'
+                }}
+                variant="h1"
                 component={RouterLink}
                 to="/"
               >
                 RAXAT-CINEMA
               </Typography>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Search />
-                <IconButton color="inherit" onClick={toggleColorMode}>
-                  {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: isMobile ? 1 : 2 
+              }}>
+                {!isMobile && <Search />}
+                <IconButton 
+                  color="inherit" 
+                  onClick={toggleColorMode}
+                  size={isMobile ? 'small' : 'medium'}
+                >
+                  {mode === 'dark' ? <Brightness7 fontSize={isMobile ? 'small' : 'medium'} /> : <Brightness4 fontSize={isMobile ? 'small' : 'medium'} />}
                 </IconButton>
               </Box>
             </Stack>
@@ -103,7 +123,7 @@ const NavBar = () => {
         onClose={handleOpen}
         sx={{
           '& .MuiDrawer-paper': {
-            width: 250,
+            width: isMobile ? 200 : 250,
             boxSizing: 'border-box',
             zIndex: (theme) => theme.zIndex.appBar,
             mt: '64px',
@@ -111,7 +131,7 @@ const NavBar = () => {
           }
         }}
       >
-        <Box sx={{ width: 250 }}>
+        <Box sx={{ width: '100%' }}>
           <List>
             {TOP_LISTS.map((item) => (
               <ListItem key={item.title} disablePadding>
@@ -119,11 +139,15 @@ const NavBar = () => {
                   component={RouterLink}
                   to={item.url}
                   onClick={handleOpen}
+                  sx={{ py: isMobile ? 0.5 : 1 }}
                 >
-                  <ListItemIcon>
+                  <ListItemIcon sx={{ minWidth: isMobile ? 36 : 48 }}>
                     <Icon iconName={item.icon} />
                   </ListItemIcon>
-                  <ListItemText primary={item.title} />
+                  <ListItemText 
+                    primary={item.title} 
+                    primaryTypographyProps={{ fontSize: isMobile ? '0.9rem' : '1rem' }}
+                  />
                 </ListItemButton>
               </ListItem>
             ))}
@@ -136,11 +160,15 @@ const NavBar = () => {
                   component={RouterLink}
                   to={item.url}
                   onClick={handleOpen}
+                  sx={{ py: isMobile ? 0.5 : 1 }}
                 >
-                  <ListItemIcon>
+                  <ListItemIcon sx={{ minWidth: isMobile ? 36 : 48 }}>
                     <Icon iconName={item.icon} />
                   </ListItemIcon>
-                  <ListItemText primary={item.title} />
+                  <ListItemText 
+                    primary={item.title} 
+                    primaryTypographyProps={{ fontSize: isMobile ? '0.9rem' : '1rem' }}
+                  />
                 </ListItemButton>
               </ListItem>
             ))}
