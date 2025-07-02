@@ -1,9 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+const API_BASE_URL = 'https://server-ds6n.onrender.com';
+
 export const likesApi = createApi({
   reducerPath: 'likesApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://server-ds6n.onrender.com/api/likes',
+    baseUrl: `${API_BASE_URL}/api/likes`,
     credentials: 'include',
     prepareHeaders: (headers) => {
       const token = localStorage.getItem('accessToken');
@@ -15,11 +17,14 @@ export const likesApi = createApi({
     getLikes: builder.query({
       query: (movieId) => `/${movieId}`,
       providesTags: ['Likes'],
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
         } catch (error) {
-          if (error.error?.status === 401) await handleRefreshToken(dispatch);
+          if (error.error?.status === 401) {
+            await handleTokenRefresh(dispatch);
+            dispatch(likesApi.util.invalidateTags(['Likes']));
+          }
         }
       },
     }),
@@ -42,31 +47,29 @@ export const likesApi = createApi({
   }),
 });
 
-async function handleRefreshToken(dispatch) {
+async function handleTokenRefresh(dispatch) {
   try {
-    const response = await fetch('https://server-ds6n.onrender.com/api/user/refresh', {
+    const response = await fetch(`${API_BASE_URL}/api/user/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken: localStorage.getItem('refreshToken') }),
+      body: JSON.stringify({ 
+        refreshToken: localStorage.getItem('refreshToken') 
+      }),
+      credentials: 'include'
     });
-    const data = await response.json();
     
+    const data = await response.json();
     if (data.accessToken) {
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
-      dispatch(likesApi.util.invalidateTags(['Likes']));
     } else {
-      logoutUser();
+      throw new Error('Token refresh failed');
     }
   } catch (error) {
-    logoutUser();
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    window.location.href = '/login';
   }
-}
-
-function logoutUser() {
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
-  window.location.href = '/login';
 }
 
 export const { 
