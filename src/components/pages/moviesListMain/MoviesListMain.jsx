@@ -12,43 +12,54 @@ import SelectMovies from '../../ui/selectMovies/SelectMovies';
 
 export default function MoviesListMain() {
   const location = useLocation();
-  const currentQuery = useSelector((state) => state.currentQuery) || {};
-  const { countries = '', order = 'NUM_VOTE', year = '', genreId = '' } = currentQuery;
-  const [page, setPage] = useState(1);
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const currentQuery = useSelector((state) => state.currentQuery) || {
+    countries: '',
+    order: 'NUM_VOTE',
+    year: '',
+    genreId: '',
+  };
+  const { countries = '', order = 'NUM_VOTE', year = '', genreId = '' } = currentQuery;
+
+  const [page, setPage] = useState(1);
 
   const movieType = MOVIE_LISTS.find((el) => el.url === location.pathname);
 
   const queryParams = {
     type: movieType?.value || 'FILM',
-    countries,
-    order,
-    year,
-    genreId: movieType?.url === '/cartoons' && !genreId ? '18' : genreId,
+    countries: countries || '',
+    order: order || 'NUM_VOTE',
+    year: year || '',
+    genreId: movieType?.url === '/cartoons' && !genreId ? '18' : genreId || '',
     page,
   };
+
+  const isValidQuery = queryParams.type && queryParams.page > 0;
 
   const {
     data: filmsData,
     error: filmsError,
     isLoading: filmsIsLoading,
-  } = useGetFilmsQuery(queryParams, { skip: !movieType });
+    isFetching,
+  } = useGetFilmsQuery(queryParams, { skip: !isValidQuery || !movieType });
 
   const { data: filtersData, error: filtersError, isLoading: filtersIsLoading } = useGetGenresAndCountriesQuery();
 
   useEffect(() => {
-    // Сбрасываем на первую страницу при изменении фильтров
-    setPage(1);
+    setPage(1); 
   }, [countries, order, year, genreId, location.pathname]);
 
   if (filmsError || filtersError) {
-    return <ErrorMessage />;
+    return <ErrorMessage message={filmsError?.data?.message || filtersError?.data?.message || 'Произошла ошибка'} />;
   }
-  if (filmsIsLoading || filtersIsLoading) {
+
+  if (filmsIsLoading || filtersIsLoading || isFetching) {
     return <MoviesListTopSkeleton />;
   }
+
   if (!movieType) {
     return <ErrorMessage message="Страница не найдена" />;
   }
@@ -56,20 +67,17 @@ export default function MoviesListMain() {
   return (
     <Box sx={{ px: isMobile ? 1 : 3, py: 2 }}>
       <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
-        <Button 
-          startIcon={<ArrowBack />} 
+        <Button
+          startIcon={<ArrowBack />}
           onClick={() => navigate(-1)}
           size={isMobile ? 'small' : 'medium'}
           sx={{ minWidth: 'auto', mr: 1 }}
         />
-        <Typography 
-          variant={isMobile ? 'h5' : 'h4'} 
-          sx={{ fontWeight: 600 }}
-        >
+        <Typography variant={isMobile ? 'h5' : 'h4'} sx={{ fontWeight: 600 }}>
           {movieType.title}
         </Typography>
       </Stack>
-      
+
       <Box sx={{ mb: 3 }}>
         <SelectMovies
           countriesList={filtersData?.countries || []}
@@ -81,7 +89,7 @@ export default function MoviesListMain() {
           isMobile={isMobile}
         />
       </Box>
-      
+
       <MoviesList
         movies={filmsData?.items || []}
         totalPages={filmsData?.totalPages || 1}
