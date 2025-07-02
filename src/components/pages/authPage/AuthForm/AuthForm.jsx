@@ -5,6 +5,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { login } from '../../../../features/authSlice';
 
+const API_BASE_URL = 'https://server-ds6n.onrender.com';
+
 const AuthForm = ({ isLogin }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -22,7 +24,7 @@ const AuthForm = ({ isLogin }) => {
     try {
       const endpoint = isLogin ? 'login' : 'registration';
       const body = isLogin ? { email: data.email, password: data.password } : data;
-      const response = await fetch(`https://server-ds6n.onrender.com/api/user/${endpoint}`, {
+      const response = await fetch(`${API_BASE_URL}/api/user/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
