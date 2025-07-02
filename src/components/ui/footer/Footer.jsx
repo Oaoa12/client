@@ -16,8 +16,8 @@ const Footer = () => {
       }}
     >
           <Typography variant='body2' color='text.secondary'>&copy; {new Date().getFullYear()} &laquo;RAXAT-CINEMA&raquo; 18+ <br />
-          Данный сайт создан исключительно в обучающих целях. <br />
-          Все права принадлежат правообладателям.
+          Фсе права защещены. <br />
+          ООО RAXAT Legendary Organisation.
           </Typography>
 
         <Typography variant='h5' color='primary.main'>RAXAT-CINEMA</Typography>
